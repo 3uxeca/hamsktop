@@ -1,0 +1,41 @@
+# Node
+node_modules/
+dist/
+.vite/
+*.log
+npm-debug.log*
+
+# Rust / Tauri
+target/
+src-tauri/target/
+src-tauri/Cargo.lock
+src-tauri/gen/
+src-tauri/WixTools/
+
+# Build artifacts
+*.dmg
+*.msi
+*.exe
+*.app/
+*.pkg
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# OMC working state (keep specs and plans, drop transient state)
+.omc/state/
+.omc/logs/
+.omc/research/
+
+# Generated assets that derive from sprite sources
+src-tauri/assets/masks/
