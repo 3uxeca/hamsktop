@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
+const inTauri = typeof (window as unknown as { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__ !== "undefined";
+
 export default function App() {
-  const [clickThrough, setClickThrough] = useState(true);
-  const [status, setStatus] = useState("initial: click-through ON (window ignores cursor events)");
+  const [clickThrough, setClickThrough] = useState(false);
+  const [status, setStatus] = useState(
+    inTauri
+      ? "initial: click-through OFF (you can click these buttons)"
+      : "WARNING: Not running inside Tauri webview — invoke() will fail. Close this browser tab and use the Tauri popup window only."
+  );
   const [cursor, setCursor] = useState<string>("(unknown)");
 
   async function toggleClickThrough() {

@@ -37,13 +37,13 @@ fn get_cursor_position() -> Result<CursorPos, String> {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            // Apply click-through ON at startup so requirement #2 starts in the
-            // "ignored" state per the spike spec.
+            // Start with click-through OFF so the user can actually click the
+            // spike's own buttons. Toggling ON is tested via the button.
             if let Some(win) = app.get_webview_window("main") {
-                if let Err(e) = win.set_ignore_cursor_events(true) {
-                    eprintln!("[spike] initial set_ignore_cursor_events(true) failed: {e}");
+                if let Err(e) = win.set_ignore_cursor_events(false) {
+                    eprintln!("[spike] initial set_ignore_cursor_events(false) failed: {e}");
                 } else {
-                    println!("[spike] initial set_ignore_cursor_events(true) -> OK");
+                    println!("[spike] initial set_ignore_cursor_events(false) -> OK");
                 }
             }
             Ok(())

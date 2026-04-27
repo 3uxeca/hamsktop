@@ -38,17 +38,25 @@ npm run tauri dev
 
 A semi-transparent dark panel with two buttons will appear on screen (no title bar, no window chrome).
 
-- [ ] **Window appears as transparent overlay** — no chrome/title bar; desktop and apps behind are visible through transparent areas; window stays on top of all other windows
-- [ ] **Click "Toggle Click-Through" button** — toggles click-through ON/OFF. When ON: clicks on the transparent area pass through to apps below. When OFF: the window captures clicks normally. Toggle repeatedly to confirm no crash or leak.
-- [ ] **Click "Print Cursor Pos" button** — status line updates with `x=…, y=…` from Rust while click-through is active (events ignored), confirming `mouse_position` crate can read global cursor position independently of `set_ignore_cursor_events` state.
+- [x] **Window appears as transparent overlay** — confirmed by user after enabling `macos-private-api` Cargo feature + `macOSPrivateApi: true` in `tauri.conf.json`. The initial scaffold without these flags rendered the macOS window opaque white.
+- [x] **Click "Toggle Click-Through" button** — confirmed by user: toggles to ON, after which the Tauri window correctly stops receiving mouse events (expected — buttons unreachable until restart).
+- [x] **Click "Print Cursor Pos" button** — confirmed by user: Rust returns global cursor coordinates (`x=…, y=…`).
 
 The magenta "HIT TARGET" box (bottom-right area of the window) provides a visible opaque region for testing click-capture vs click-through contrast.
+
+### Spike Findings (carry to A.1)
+
+1. **macOS transparent window requires private API** — without `macos-private-api` feature flag on the `tauri` crate AND `macOSPrivateApi: true` under `app` in `tauri.conf.json`, the window is opaque white on macOS even with `transparent: true`. A.1 bootstrap MUST include both. Note: this prevents Mac App Store distribution but is acceptable for v0.1.
+2. **Initial click-through state should default to OFF** — starting with `set_ignore_cursor_events(true)` makes the spike unusable (the user can't click their own UI). For Hamsktop the same default applies; click-through gets dynamically toggled by adaptive polling based on cursor position relative to the sprite alpha mask.
+3. **No global hot-key escape** — once click-through is ON, there is no recovery without restarting the process. A.1 should register a global shortcut (e.g., `Cmd+Shift+H`) that force-disables click-through, both for development sanity and as a user-facing safety net.
+4. **`tauri::generate_context!()` panics if `frontendDist` directory does not exist** — A.1 must run `npm run build` (or arrange a placeholder dist) before the first `cargo check`, or use a config that points `frontendDist` at an always-existing path.
+5. **`localhost:1420` browser tab confusion** — Vite dev server is reachable in any browser, but `__TAURI_INTERNALS__` is undefined there, so `invoke()` calls fail. The spike App.tsx now displays an explicit warning when not in a Tauri webview; A.1 should keep the same guard.
 
 ## Final Verdict
 
 - **Programmatic**: TAURI-V2-OK (all 3 APIs compile and are correctly wired)
-- **Awaiting**: USER-VISUAL-CONFIRM
-- **Provisional**: PROCEED-WITH-V2
+- **Visual**: USER-CONFIRMED (all 3 checks passed after macOS private-api fix)
+- **Final**: **PROCEED-WITH-V2** — A.1 bootstrap may begin, applying the 5 findings above
 
 ## If Visual Fails
 
