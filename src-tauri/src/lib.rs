@@ -75,6 +75,29 @@ pub fn run() {
                 eprintln!("[setup] register safety-net shortcut failed: {e}");
             }
 
+            // Default placement: bottom-right of the primary monitor with a
+            // generous margin so the window clears the macOS Dock / Windows
+            // taskbar. Persisted positions (milestone D) will override this.
+            if let Some(win) = app.get_webview_window("main") {
+                if let Ok(Some(monitor)) = win.primary_monitor() {
+                    let monitor_size = monitor.size();
+                    let scale = monitor.scale_factor();
+                    let win_w_phys = (220.0 * scale) as i32;
+                    let win_h_phys = (220.0 * scale) as i32;
+                    let right_margin = (24.0 * scale) as i32;
+                    #[cfg(target_os = "macos")]
+                    let bottom_margin = (90.0 * scale) as i32;
+                    #[cfg(not(target_os = "macos"))]
+                    let bottom_margin = (60.0 * scale) as i32;
+                    let monitor_pos = monitor.position();
+                    let x = monitor_pos.x + monitor_size.width as i32 - win_w_phys - right_margin;
+                    let y = monitor_pos.y + monitor_size.height as i32 - win_h_phys - bottom_margin;
+                    if let Err(e) = win.set_position(tauri::PhysicalPosition::new(x, y)) {
+                        eprintln!("[setup] set_position bottom-right failed: {e}");
+                    }
+                }
+            }
+
             // Milestone B.3: spawn the adaptive hit-test loop so the window
             // toggles click-through based on alpha-mask sampling.
             hit_test::spawn(app.handle());
