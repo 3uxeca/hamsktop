@@ -21,12 +21,11 @@ body,
   justify-content: center;
 }
 
-.hamster-placeholder {
-  width: 48px;
-  height: 48px;
-  background: #8b5a2b; /* brown placeholder for the hamster sprite */
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+.hamster-canvas {
+  display: block;
+  /* Keep pixel-art crisp on high-DPI displays. */
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
 }
 
 .dev-warning {
