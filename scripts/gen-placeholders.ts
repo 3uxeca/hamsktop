@@ -31,7 +31,7 @@ interface Spec {
 }
 
 const SPECS: Spec[] = [
-  { name: "baby", color: { r: 96, g: 200, b: 96, a: 255 }, radius: 8 }, // small green
+  { name: "baby", color: { r: 240, g: 222, b: 180, a: 255 }, radius: 8 }, // small ivory/beige
   { name: "adult", color: { r: 139, g: 90, b: 43, a: 255 }, radius: 12 }, // medium brown
   { name: "senior", color: { r: 160, g: 160, b: 160, a: 255 }, radius: 14 }, // large gray
 ];

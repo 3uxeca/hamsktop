@@ -22,6 +22,17 @@ const SPRITE_DISPLAY_SCALE: f64 = 3.0; // matches HamsterSprite.tsx SCALE
 const FAR_POLL_MS: u64 = 500; // 2 fps
 const NEAR_POLL_MS: u64 = 33; // ~30 fps
 
+/// While the React-side ActionMenu is open, the menu floats outside the sprite's
+/// alpha mask, so naive hit-test would re-enable click-through and the user's
+/// click on a menu button would pass through to the app behind. This flag is
+/// flipped by the `set_menu_open` Tauri command from App.tsx; while true, the
+/// loop forces the window into capture mode and skips the per-tick toggle.
+static MENU_OPEN: AtomicBool = AtomicBool::new(false);
+
+pub fn set_menu_open(open: bool) {
+    MENU_OPEN.store(open, Ordering::Relaxed);
+}
+
 #[derive(Debug, Deserialize)]
 struct FrameChangedPayload {
     stage: String,
@@ -94,6 +105,13 @@ fn tick(
     let Some(window) = app.get_webview_window("main") else {
         return FAR_POLL_MS;
     };
+
+    // ActionMenu open => force capture mode and poll fast so we react quickly
+    // when the menu closes. The state flip is debounced via last_opaque.
+    if MENU_OPEN.load(Ordering::Relaxed) {
+        ensure_state(&window, true, last_opaque);
+        return NEAR_POLL_MS;
+    }
 
     // Read window position & DPI in physical pixels.
     let win_pos = match window.outer_position() {

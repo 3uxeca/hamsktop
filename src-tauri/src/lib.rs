@@ -8,12 +8,21 @@ pub mod idle;
 pub mod lifecycle;
 pub mod persistence;
 
-use tauri::{Manager, WebviewWindow};
+use tauri::{Emitter, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 fn get_main_window(app: &tauri::AppHandle) -> Result<WebviewWindow, String> {
     app.get_webview_window("main")
         .ok_or_else(|| "main window not found".to_string())
+}
+
+/// Frontend tells Rust whether the React-side ActionMenu is open. While true,
+/// the hit-test loop forces capture mode so menu buttons receive their click
+/// instead of letting it fall through to the app behind. See hit_test/mod.rs.
+#[tauri::command]
+fn set_menu_open(open: bool) {
+    hit_test::set_menu_open(open);
+    println!("[menu] set_menu_open({open})");
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -31,16 +40,25 @@ pub fn run() {
                 .with_handler(move |app, shortcut, event| {
                     if shortcut == &safety_shortcut && event.state() == ShortcutState::Pressed {
                         if let Ok(win) = get_main_window(app) {
+                            // Also clear the menu-open flag so the loop returns
+                            // to normal alpha-mask sampling after the rescue.
+                            hit_test::set_menu_open(false);
                             if let Err(e) = win.set_ignore_cursor_events(false) {
                                 eprintln!("[hotkey] force-disable click-through failed: {e}");
                             } else {
                                 println!("[hotkey] safety net fired -> click-through OFF");
+                                if let Err(e) =
+                                    app.emit("hotkey:safety-fired", "click-through OFF")
+                                {
+                                    eprintln!("[hotkey] emit safety-fired failed: {e}");
+                                }
                             }
                         }
                     }
                 })
                 .build(),
         )
+        .invoke_handler(tauri::generate_handler![set_menu_open])
         .setup(move |app| {
             // Spike finding #2: start with click-through OFF so the window is
             // immediately interactive. Adaptive hit-test (milestone B) flips it

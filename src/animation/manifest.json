@@ -5,21 +5,21 @@
     "baby": {
       "sheet": "placeholders/baby.png",
       "animations": {
-        "idle": { "row": 0, "frames": 2, "fps": 6 },
+        "idle": { "row": 0, "frames": 1, "fps": 1 },
         "sleep": { "row": 3, "frames": 1, "fps": 1 }
       }
     },
     "adult": {
       "sheet": "placeholders/adult.png",
       "animations": {
-        "idle": { "row": 0, "frames": 2, "fps": 6 },
+        "idle": { "row": 0, "frames": 1, "fps": 1 },
         "sleep": { "row": 3, "frames": 1, "fps": 1 }
       }
     },
     "senior": {
       "sheet": "placeholders/senior.png",
       "animations": {
-        "idle": { "row": 0, "frames": 2, "fps": 6 },
+        "idle": { "row": 0, "frames": 1, "fps": 1 },
         "sleep": { "row": 3, "frames": 1, "fps": 1 }
       }
     }
