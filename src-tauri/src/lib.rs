@@ -57,6 +57,10 @@ pub fn run() {
                 eprintln!("[setup] register safety-net shortcut failed: {e}");
             }
 
+            // Milestone B.3: spawn the adaptive hit-test loop so the window
+            // toggles click-through based on alpha-mask sampling.
+            hit_test::spawn(app.handle());
+
             Ok(())
         })
         .run(tauri::generate_context!())
