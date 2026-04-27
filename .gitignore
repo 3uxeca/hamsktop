@@ -8,9 +8,11 @@ npm-debug.log*
 # Rust / Tauri
 target/
 src-tauri/target/
-src-tauri/Cargo.lock
 src-tauri/gen/
 src-tauri/WixTools/
+# Note: src-tauri/Cargo.lock is committed (binary app, reproducible builds)
+# Only the spike's lock is ignored to keep the historical reference lean
+src-tauri-spike/src-tauri/Cargo.lock
 
 # Build artifacts
 *.dmg
