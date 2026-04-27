@@ -9,7 +9,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "gen:placeholders": "tsx scripts/gen-placeholders.ts"
+    "gen:placeholders": "tsx scripts/gen-placeholders.ts",
+    "gen:masks": "tsx scripts/generate-alpha-mask.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.10.1",
