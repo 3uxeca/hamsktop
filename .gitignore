@@ -41,3 +41,7 @@ src-tauri-spike/src-tauri/Cargo.lock
 
 # Generated assets that derive from sprite sources
 src-tauri/assets/masks/
+
+# Mobile icon outputs from `tauri icon` (desktop-only project)
+src-tauri/icons/android/
+src-tauri/icons/ios/
