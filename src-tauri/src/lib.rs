@@ -77,24 +77,46 @@ pub fn run() {
 
             // Default placement: bottom-right of the primary monitor with a
             // generous margin so the window clears the macOS Dock / Windows
-            // taskbar. Persisted positions (milestone D) will override this.
+            // taskbar. Logical pixels keep the math identical across DPI
+            // scales; sanity-clamp to the monitor rect so a misconfigured
+            // multi-monitor layout cannot shove the window off-screen.
+            // Persisted positions (milestone D) will override this.
             if let Some(win) = app.get_webview_window("main") {
                 if let Ok(Some(monitor)) = win.primary_monitor() {
                     let monitor_size = monitor.size();
-                    let scale = monitor.scale_factor();
-                    let win_w_phys = (220.0 * scale) as i32;
-                    let win_h_phys = (220.0 * scale) as i32;
-                    let right_margin = (24.0 * scale) as i32;
-                    #[cfg(target_os = "macos")]
-                    let bottom_margin = (90.0 * scale) as i32;
-                    #[cfg(not(target_os = "macos"))]
-                    let bottom_margin = (60.0 * scale) as i32;
                     let monitor_pos = monitor.position();
-                    let x = monitor_pos.x + monitor_size.width as i32 - win_w_phys - right_margin;
-                    let y = monitor_pos.y + monitor_size.height as i32 - win_h_phys - bottom_margin;
-                    if let Err(e) = win.set_position(tauri::PhysicalPosition::new(x, y)) {
+                    let scale = monitor.scale_factor();
+                    let mon_w_log = monitor_size.width as f64 / scale;
+                    let mon_h_log = monitor_size.height as f64 / scale;
+                    let mon_x_log = monitor_pos.x as f64 / scale;
+                    let mon_y_log = monitor_pos.y as f64 / scale;
+                    let win_w_log = 220.0;
+                    let win_h_log = 220.0;
+                    let right_margin = 24.0;
+                    #[cfg(target_os = "macos")]
+                    let bottom_margin = 90.0; // Dock height-ish
+                    #[cfg(not(target_os = "macos"))]
+                    let bottom_margin = 60.0; // Windows taskbar height-ish
+
+                    let mut x = mon_x_log + mon_w_log - win_w_log - right_margin;
+                    let mut y = mon_y_log + mon_h_log - win_h_log - bottom_margin;
+                    // Clamp inside the monitor in case the calculation went
+                    // negative (would happen if scale_factor read 0 or the
+                    // monitor rect was reported with unexpected units).
+                    if x < mon_x_log {
+                        x = mon_x_log + 24.0;
+                    }
+                    if y < mon_y_log {
+                        y = mon_y_log + 24.0;
+                    }
+                    println!(
+                        "[setup] monitor ({mon_x_log},{mon_y_log}) {mon_w_log}x{mon_h_log} scale={scale} -> placing at ({x},{y})"
+                    );
+                    if let Err(e) = win.set_position(tauri::LogicalPosition::new(x, y)) {
                         eprintln!("[setup] set_position bottom-right failed: {e}");
                     }
+                } else {
+                    eprintln!("[setup] primary_monitor unavailable; using OS default position");
                 }
             }
 
