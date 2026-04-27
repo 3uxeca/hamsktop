@@ -1,0 +1,49 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+    "Malgun Gothic", sans-serif;
+  color: #fff;
+}
+
+.hamster-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamster-placeholder {
+  width: 48px;
+  height: 48px;
+  background: #8b5a2b; /* brown placeholder for the hamster sprite */
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.dev-warning {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  padding: 10px 12px;
+  background: rgba(120, 30, 30, 0.85);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.dev-warning code {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", monospace;
+}
