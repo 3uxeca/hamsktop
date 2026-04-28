@@ -113,24 +113,32 @@ fn tick(
         return NEAR_POLL_MS;
     }
 
-    // Read window position & DPI in physical pixels.
+    // Read window position (physical px) and DPI.
     let win_pos = match window.outer_position() {
         Ok(p) => p,
         Err(_) => return FAR_POLL_MS,
     };
     let scale = window.scale_factor().unwrap_or(1.0);
 
-    // Read global cursor (physical px on macOS/Windows).
+    // Read global cursor. Unit varies per platform:
+    //   macOS — CGEventGetLocation returns LOGICAL points
+    //   Windows — GetCursorPos returns PHYSICAL pixels
+    //   Linux — X11 returns PHYSICAL pixels
+    // Normalize everything to LOGICAL pixels for the rest of the math.
     let cursor = match Mouse::get_mouse_position() {
         Mouse::Position { x, y } => (x as f64, y as f64),
         Mouse::Error => return FAR_POLL_MS,
     };
+    #[cfg(target_os = "macos")]
+    let (cursor_log_x, cursor_log_y) = (cursor.0, cursor.1);
+    #[cfg(not(target_os = "macos"))]
+    let (cursor_log_x, cursor_log_y) = (cursor.0 / scale, cursor.1 / scale);
 
-    // Convert cursor relative to window in *logical* pixels.
-    let rel_phys_x = cursor.0 - win_pos.x as f64;
-    let rel_phys_y = cursor.1 - win_pos.y as f64;
-    let rel_log_x = rel_phys_x / scale;
-    let rel_log_y = rel_phys_y / scale;
+    // Window position in logical pixels.
+    let win_x_log = win_pos.x as f64 / scale;
+    let win_y_log = win_pos.y as f64 / scale;
+    let rel_log_x = cursor_log_x - win_x_log;
+    let rel_log_y = cursor_log_y - win_y_log;
 
     // Sprite is centered in the 128x128 window at display scale (96x96 visible).
     let display_size = SPRITE_LOGICAL_SIZE * SPRITE_DISPLAY_SCALE; // 96
