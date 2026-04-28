@@ -12,16 +12,18 @@ const ROWS: { key: StatKey; label: string; color: string }[] = [
 ];
 
 export function StatsGauges() {
-  const stats = useHamsterStore((s) => ({
-    hunger: s.hunger,
-    happiness: s.happiness,
-    affinity: s.affinity,
-  }));
+  // Subscribe to each stat individually. Returning a new {} from a single
+  // selector triggers an infinite re-render loop with zustand's default
+  // Object.is comparison.
+  const hunger = useHamsterStore((s) => s.hunger);
+  const happiness = useHamsterStore((s) => s.happiness);
+  const affinity = useHamsterStore((s) => s.affinity);
+  const values: Record<StatKey, number> = { hunger, happiness, affinity };
 
   return (
     <div className="stats-gauges">
       {ROWS.map(({ key, label, color }) => {
-        const value = stats[key];
+        const value = values[key];
         return (
           <div className="gauge" key={key}>
             <span className="gauge__label">{label}</span>

@@ -148,14 +148,28 @@ body,
   /* Keep pixel-art crisp on high-DPI displays. */
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
+  /* Subtle idle bob so the hamster never looks frozen. The wrap-level
+     reaction animations (bounce/wobble/jump) compose on top because they
+     transform the parent .hamster-wrap, not this canvas. */
+  animation: idle-bob 3.2s ease-in-out infinite;
 }
 
-/* Stat gauges — sit at the bottom of the window beneath the hamster. */
+@keyframes idle-bob {
+  0%,
+  100% { transform: translate(0, 0); }
+  25% { transform: translate(1px, -3px); }
+  50% { transform: translate(0, -1px); }
+  75% { transform: translate(-1px, -3px); }
+}
+
+/* Stat gauges — narrow column centered under the sprite. Width matches the
+   hamster's display size so the gauges never extend wider than the pet. */
 .stats-gauges {
   position: absolute;
-  left: 8px;
-  right: 8px;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 6px;
+  width: 120px;
   display: flex;
   flex-direction: column;
   gap: 3px;
