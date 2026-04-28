@@ -7,8 +7,8 @@
 | # | 제목 | 추정 | 상태 |
 |---|------|------|------|
 | A | 스켈레톤 + Tauri v2 검증 spike | 1.5–2.5일 | ✅ 완료 (`9510776`) |
-| B | 스프라이트 + Hit-Test + 인터랙션 | 3–4일 | ⏳ 다음 |
-| C | Idle/Active 감지 + 성장 루프 | 2–3일 | 🟡 |
+| B | 스프라이트 + Hit-Test + 인터랙션 + UI 폴리시 | 3–4일 | ✅ 완료 (`fc1315f`) |
+| C | Idle/Active 감지 + 성장 루프 | 2–3일 | ⏳ 다음 |
 | D | 라이프사이클 완결 + 영속 저장 | 2–3일 | 🟡 |
 | E | 폴리싱 + 패키징 | 2–3일 | 🟡 |
 
@@ -40,7 +40,7 @@
 
 ---
 
-## ⏳ Milestone B: 스프라이트 + Hit-Test + 인터랙션 (3–4일, 다음)
+## ✅ Milestone B: 스프라이트 + Hit-Test + 인터랙션 + UI 폴리시 (완료)
 
 **목표**: 도트 햄스터가 스프라이트 시트에서 애니메이션 재생, 햄스터 몸 위만 클릭 차단, 클릭 시 액션 메뉴 등장.
 
@@ -79,7 +79,7 @@
 
 ---
 
-## 🟡 Milestone C: Idle/Active 감지 + 성장 루프 (2–3일)
+## ⏳ Milestone C: Idle/Active 감지 + 성장 루프 (2–3일, 다음)
 
 **목표**: OS 레벨 idle 감지가 햄스터 성장을 구동. active 시간 누적 → 라이프 스테이지 시각적 전환.
 
@@ -194,12 +194,27 @@
 
 각 마일스톤은 별도 commit (또는 commits 묶음)으로 push됩니다. `git log --oneline` 또는 GitHub commits 탭에서 추적 가능.
 
-이미 끝난 것 (A 마일스톤):
+### A 마일스톤 (완료)
 - `c4a88bf` bootstrap (spec + plan)
 - `aa10c3e` A.0 spike scaffold
 - `a7360ef` A.0 spike fix (visual PASS)
-- `a53a36a` A.1 real bootstrap
-- `84a2709` A.2 CI matrix
+- `a53a36a` A.1 real bootstrap (Tauri v2 + React/Vite/Zustand + 모듈 stub + placeholder sprites + Cmd+Shift+H 안전 hotkey)
+- `84a2709` A.2 CI matrix (.github/workflows/build.yml, macOS+Windows runners)
 - `3fc8c3b` Cargo.lock 트래킹
 - `87c0814` CI: --no-bundle (Milestone E로 packaging 이연)
+- `9510776` 플랫폼 아이콘(icon.ico, icon.icns) 추가 → CI 통과
+- `31eae1d` 한국어 마일스톤 요약 문서
+
+### B 마일스톤 (완료)
+- `4199a59` B.1 — Canvas 스프라이트 렌더러 + 프레임 시퀀서 (frame-changed 이벤트 emit)
+- `1dabd17` B.2 — 알파 마스크 생성기 + per-stage mask JSON
+- `1a445ac` B.3 — Rust 적응형 hit-test (2fps far / 30fps near) + 한국어 액션 메뉴
+- `89950ad` B fix — 베이지 baby 색, 정적 placeholder, 메뉴 click capture (set_menu_open command), Cmd+Shift+H 토스트
+- `7b82859` B+ polish — 윈도우 220×220, 드래그 가능, 게이지 3개(배고픔/행복감/친밀도), 액션 효과(bounce/wobble/jump + 이모지), 둥근모 폰트
+- `763e36a` 위치 LogicalPosition 변환 (multi-monitor sanity)
+- `c9b78e9` hit-test cursor 좌표 macOS logical 정규화 (클릭 안 되는 버그 fix)
+- `fc1315f` B+ polish round 2 — 우측 하단 conf x/y, StatsGauges zustand 무한 루프 fix, 게이지 폭/사이즈 정리, idle bob 모션, 디버그 코드 cleanup
+
+### 다음 (C부터 D, E)
+별도 commit으로 진행 예정. 현재 origin/main과 sync 필요.
 - `9510776` CI: 플랫폼 아이콘 추가 (icon.ico, icon.icns)
